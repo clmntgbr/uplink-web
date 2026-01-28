@@ -10,6 +10,7 @@ export interface SessionData {
 }
 
 export function setSessionCookie(response: NextResponse, token: string): void {
+  console.log("Setting session cookie with token:", token?.substring(0, 20) + "...");
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: token,
@@ -19,6 +20,7 @@ export function setSessionCookie(response: NextResponse, token: string): void {
     maxAge: COOKIE_MAX_AGE,
     path: "/",
   });
+  console.log("Cookie set successfully");
 }
 
 export function getSessionToken(request: NextRequest): string | null {

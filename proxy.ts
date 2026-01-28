@@ -15,7 +15,7 @@ export default async function proxy(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isPublicRoute = publicRoutes.some((route) => path === route);
 
-  const cookie = (await cookies()).get("session_token")?.value;
+  const cookie = (await cookies()).get("session")?.value;
 
   if (isProtectedRoute) {
     if (!cookie) {
