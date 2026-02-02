@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,6 +14,7 @@ import {
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { LockIcon, MailIcon, Loader2Icon } from "lucide-react"
+import { login } from "@/lib/auth/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -34,25 +34,11 @@ export default function LoginPage() {
     const password = formData.get("password") as string
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}))
-        setError(data.message || "Authentication failed")
-        return
-      }
-
+      await login({ email, password })
       router.push(callbackUrl)
       router.refresh()
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
-    } finally {
-      setIsLoading(false)
+    } catch (error) {
+      console.error(error)
     }
   }
 

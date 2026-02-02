@@ -1,64 +1,41 @@
-import { cookies } from "next/headers";
+import { setSessionCookie } from "@/lib/session";
 import { NextResponse } from "next/server";
-import {
-  AUTH_COOKIE_NAME,
-  COOKIE_MAX_AGE,
-  encodeSession,
-  type Session,
-} from "@/lib/auth";
+
+const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 export async function POST(request: Request) {
+  console.log(BACKEND_API_URL);
   try {
-    const { email, password } = await request.json();
+    const body = await request.json();
 
-    console.log("Login attempt for:", email);
-
-    const response = await fetch("https://localhost/api/auth/login", {
+    const response = await fetch(`${BACKEND_API_URL}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     });
-
-    console.log("Backend response status:", response.status);
 
     if (!response.ok) {
-      return NextResponse.json(
-        { message: "Invalid email or password" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false }, { status: response.status });
     }
 
-    const { token, user } = await response.json();
+    const { user, token } = await response.json();
 
-    console.log("Login successful for user:", user.email);
+    if (!token || !user) {
+      return NextResponse.json({ success: false }, { status: 500 });
+    }
 
-    const sessionData: Session = {
+    const { id, email, firstname, lastname, picture, roles } = user;
+    const nextResponse = NextResponse.json({
+      user: { id, email, firstname, lastname, picture, roles },
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    };
-
-    const cookieStore = await cookies();
-    cookieStore.set(AUTH_COOKIE_NAME, encodeSession(sessionData), {
-      maxAge: COOKIE_MAX_AGE,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
     });
 
-    return NextResponse.json({
-      success: true,
-      user: sessionData.user,
-    });
+    setSessionCookie(nextResponse, token);
+    return nextResponse;
   } catch (error) {
-    console.error("Login error:", error);
-    return NextResponse.json(
-      { message: "Authentication service unavailable" },
-      { status: 500 }
-    );
+    console.log(error);
+    return NextResponse.json({ success: false }, { status: 500 });
   }
 }

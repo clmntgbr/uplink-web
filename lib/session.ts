@@ -1,39 +1,54 @@
-import { cookies } from "next/headers";
-import { AUTH_COOKIE_NAME, decodeSession, type Session } from "./auth";
+import { NextRequest, NextResponse } from "next/server";
+import { decodeToken, JWTPayload } from "@/lib/jwt";
 
-/**
- * Get the current session from the auth cookie (server-side)
- * Use this in Server Components, Server Actions, and Route Handlers
- */
-export async function getSession(): Promise<Session | null> {
-  try {
-    const cookieStore = await cookies();
-    const authCookie = cookieStore.get(AUTH_COOKIE_NAME);
+const SESSION_COOKIE_NAME = "session";
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
 
-    if (!authCookie?.value) {
-      return null;
-    }
+export interface SessionData {
+  token: string;
+  user: JWTPayload;
+}
 
-    return decodeSession(authCookie.value);
-  } catch (error) {
-    console.error("Error getting session:", error);
+export function setSessionCookie(response: NextResponse, token: string): void {
+  response.cookies.set({
+    name: SESSION_COOKIE_NAME,
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE,
+    path: "/",
+  });
+}
+
+export function getSessionToken(request: NextRequest): string | null {
+  return request.cookies.get(SESSION_COOKIE_NAME)?.value || null;
+}
+
+export function clearSessionCookie(response: NextResponse): void {
+  response.cookies.set({
+    name: SESSION_COOKIE_NAME,
+    value: "",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
+}
+
+export function getSessionData(request: NextRequest): SessionData | null {
+  const token = getSessionToken(request);
+
+  if (!token) {
     return null;
   }
-}
 
-/**
- * Check if the user is authenticated (server-side)
- */
-export async function isAuthenticated(): Promise<boolean> {
-  const session = await getSession();
-  return session !== null;
-}
+  const user = decodeToken(token);
 
-/**
- * Get the auth token from the session (server-side)
- * Useful for making authenticated API calls to your backend
- */
-export async function getAuthToken(): Promise<string | null> {
-  const session = await getSession();
-  return session?.token ?? null;
+  if (!user) {
+    return null;
+  }
+
+  return { token, user };
 }
