@@ -1,19 +1,18 @@
-import { ProjectAction, ProjectState } from "./types";
+import { EndpointAction, EndpointState } from "./types";
 
-export const ProjectReducer = (state: ProjectState, action: ProjectAction): ProjectState => {
+export const EndpointReducer = (state: EndpointState, action: EndpointAction): EndpointState => {
   switch (action.type) {
-    case "SET_PROJECTS":
+    case "SET_ENDPOINTS":
       return {
         ...state,
-        projects: action.payload,
-        project: action.project,
+        endpoints: action.payload,
         isLoading: false,
         error: null,
       };
     case "SET_ERROR":
       return {
         ...state,
-        projects: {
+        endpoints: {
           member: [],
           currentPage: 0,
           itemsPerPage: 0,

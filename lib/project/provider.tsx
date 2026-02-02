@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { getProjects } from "./api";
 import { ProjectContext } from "./context";
-import { projectReducer } from "./reducer";
+import { ProjectReducer } from "./reducer";
 import { ProjectState } from "./types";
 
 const initialState: ProjectState = {
@@ -20,7 +20,7 @@ const initialState: ProjectState = {
 };
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(projectReducer, initialState);
+  const [state, dispatch] = useReducer(ProjectReducer, initialState);
 
   const fetchProjects = useCallback(async () => {
     try {
