@@ -6,8 +6,8 @@ export interface Endpoint {
   baseUri: string;
   path: string;
   method: string;
-  headers: Record<string, string>;
-  body: string;
+  header: Record<string, string>;
+  body: Record<string, string>;
   isActive: boolean;
   timeoutSeconds: number;
 }
@@ -18,6 +18,8 @@ export interface CreateEndpointPayload {
   path: string;
   method: string;
   timeoutSeconds: number;
+  header: Record<string, string>;
+  body: Record<string, string>;
 }
 
 export interface EndpointState {

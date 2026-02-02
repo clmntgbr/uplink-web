@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,10 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useEndpoint } from "@/lib/endpoint/context";
 import { createEndpointSchema } from "@/lib/endpoint/schema";
-import { CreateEndpointPayload } from "@/lib/endpoint/types";
 import { HTTP_METHODS } from "next/dist/server/web/http";
 
 type EndpointFormData = z.infer<typeof createEndpointSchema>;
+
+interface KeyValuePair {
+  key: string;
+  value: string;
+}
 
 interface CreateEndpointDialogProps {
   open?: boolean;
@@ -32,6 +36,8 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   const isOpen = isControlled ? open : internalOpen;
   const setIsOpen = isControlled ? onOpenChange! : setInternalOpen;
 
+  const [headers, setHeaders] = useState<KeyValuePair[]>([]);
+
   const form = useForm<EndpointFormData>({
     resolver: zodResolver(createEndpointSchema),
     defaultValues: {
@@ -44,14 +50,37 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     },
   });
 
-  async function onSubmit(payload: CreateEndpointPayload) {
-    const endpoint = {
-      ...payload,
+  const keyValueToRecord = (pairs: KeyValuePair[]): Record<string, string> => {
+    return pairs.reduce((acc, { key, value }) => {
+      if (key.trim()) acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+  };
+
+  async function onSubmit(data: EndpointFormData) {
+    let bodyObj: Record<string, string> = {};
+    if (data.body && data.body.trim()) {
+      try {
+        bodyObj = JSON.parse(data.body);
+      } catch {
+        // Already validated by zod
+      }
+    }
+
+    const payload = {
+      name: data.name,
+      baseUri: data.baseUri,
+      path: data.path,
+      method: data.method,
+      timeoutSeconds: data.timeoutSeconds,
+      header: keyValueToRecord(headers),
+      body: bodyObj,
     };
 
-    await createEndpoint(endpoint);
+    await createEndpoint(payload);
     setIsOpen(false);
     form.reset();
+    setHeaders([]);
   }
 
   function onError() {}
@@ -59,7 +88,50 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   const handleCancel = () => {
     setIsOpen(false);
     form.reset();
+    setHeaders([]);
   };
+
+  const addKeyValue = (setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>) => {
+    setter((prev) => [...prev, { key: "", value: "" }]);
+  };
+
+  const removeKeyValue = (setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>, index: number) => {
+    setter((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateKeyValue = (setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>, index: number, field: "key" | "value", value: string) => {
+    setter((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  };
+
+  const renderKeyValueFields = (label: string, pairs: KeyValuePair[], setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>) => (
+    <Field>
+      <div className="flex items-center justify-between">
+        <FieldLabel>{label}</FieldLabel>
+        <Button type="button" size="xs" variant="ghost" onClick={() => addKeyValue(setter)}>
+          <Plus className="size-3" />
+          Add
+        </Button>
+      </div>
+      {pairs.length > 0 && (
+        <div className="space-y-2">
+          {pairs.map((pair, index) => (
+            <div key={index} className="flex gap-2">
+              <Input placeholder="Key" value={pair.key} onChange={(e) => updateKeyValue(setter, index, "key", e.target.value)} className="flex-1" />
+              <Input
+                placeholder="Value"
+                value={pair.value}
+                onChange={(e) => updateKeyValue(setter, index, "value", e.target.value)}
+                className="flex-1"
+              />
+              <Button type="button" size="icon-xs" variant="ghost" onClick={() => removeKeyValue(setter, index)}>
+                <X className="size-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </Field>
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -69,7 +141,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
           Create Endpoint
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Endpoint</DialogTitle>
           <DialogDescription>Configure a new API endpoint to monitor.</DialogDescription>
@@ -158,6 +230,8 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                 )}
               />
             </div>
+
+            {renderKeyValueFields("Headers", headers, setHeaders)}
 
             <Controller
               name="body"
