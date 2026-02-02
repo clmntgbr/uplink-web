@@ -1,5 +1,5 @@
 import { Hydra } from "@/lib/hydra";
-import { Endpoint } from "./types";
+import { CreateEndpointPayload, Endpoint } from "./types";
 
 export const getEndpoints = async (): Promise<Hydra<Endpoint>> => {
   const response = await fetch("/api/endpoints", {
@@ -11,4 +11,18 @@ export const getEndpoints = async (): Promise<Hydra<Endpoint>> => {
   }
 
   return response.json();
+};
+
+export const createEndpoint = async (payload: CreateEndpointPayload): Promise<void> => {
+  const response = await fetch("/api/endpoints", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create endpoint");
+  }
 };

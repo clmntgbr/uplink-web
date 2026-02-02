@@ -27,3 +27,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const auth = requireAuth(request);
+    if ("error" in auth) return auth.error;
+
+    const payload = await request.json();
+
+    const headers = createAuthHeaders(auth.token);
+    headers["Content-Type"] = "application/ld+json";
+
+    const response = await fetch(`${BACKEND_API_URL}/endpoints`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      return NextResponse.json({ success: false }, { status: response.status });
+    }
+
+    const data = await response.json();
+    const endpoint = pick(data, ["id", "name", "baseUri", "path", "method", "timeoutSeconds"]);
+    return NextResponse.json(endpoint);
+  } catch {
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
+}

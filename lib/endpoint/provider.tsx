@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
-import { getEndpoints } from "./api";
+import { createEndpoint as createEndpointApi, getEndpoints } from "./api";
 import { EndpointContext } from "./context";
 import { EndpointReducer } from "./reducer";
-import { EndpointState } from "./types";
+import { CreateEndpointPayload, EndpointState } from "./types";
 
 const initialState: EndpointState = {
   endpoints: {
@@ -33,6 +33,21 @@ export function EndpointProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const createEndpoint = useCallback(
+    async (payload: CreateEndpointPayload) => {
+      try {
+        dispatch({ type: "SET_LOADING", payload: true });
+        await createEndpointApi(payload);
+        await fetchEndpoints();
+      } catch {
+        dispatch({ type: "SET_ERROR", payload: "Failed to create endpoint" });
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    },
+    [fetchEndpoints]
+  );
+
   useEffect(() => {
     fetchEndpoints();
   }, [fetchEndpoints]);
@@ -42,6 +57,7 @@ export function EndpointProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...state,
         fetchEndpoints,
+        createEndpoint,
       }}
     >
       {children}
