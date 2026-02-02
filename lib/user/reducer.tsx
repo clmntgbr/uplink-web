@@ -16,7 +16,7 @@ export const userReducer = (state: UserState, action: UserAction): UserState => 
         isLoading: false,
         error: action.payload,
       };
-    case "SET_IS_LOADING":
+    case "SET_LOADING":
       return {
         ...state,
         isLoading: action.payload,

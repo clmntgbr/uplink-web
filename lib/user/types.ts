@@ -13,8 +13,4 @@ export interface UserState {
   error: string | null;
 }
 
-export type UserAction =
-  | { type: "SET_USER"; payload: User }
-  | { type: "SET_ERROR"; payload: string }
-  | { type: "SET_IS_LOADING"; payload: boolean }
-  | { type: "CLEAR_USER" };
+export type UserAction = { type: "SET_USER"; payload: User } | { type: "SET_ERROR"; payload: string } | { type: "SET_LOADING"; payload: boolean };

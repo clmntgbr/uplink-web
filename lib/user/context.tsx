@@ -4,8 +4,7 @@ import { createContext, useContext } from "react";
 import { UserState } from "./types";
 
 export interface UserContextType extends UserState {
-  handleFetchUser: () => Promise<void>;
-  handleClearUser: () => void;
+  fetchUser: () => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);

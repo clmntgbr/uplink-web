@@ -15,32 +15,27 @@ const initialState: UserState = {
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(userReducer, initialState);
 
-  const handleFetchUser = useCallback(async () => {
+  const fetchUser = useCallback(async () => {
     try {
-      dispatch({ type: "SET_IS_LOADING", payload: true });
+      dispatch({ type: "SET_LOADING", payload: true });
       const user = await getUser();
       dispatch({ type: "SET_USER", payload: user });
     } catch {
       dispatch({ type: "SET_ERROR", payload: "Failed to fetch user" });
     } finally {
-      dispatch({ type: "SET_IS_LOADING", payload: false });
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   }, []);
 
-  const handleClearUser = useCallback(() => {
-    dispatch({ type: "CLEAR_USER" });
-  }, []);
-
   useEffect(() => {
-    handleFetchUser();
-  }, [handleFetchUser]);
+    fetchUser();
+  }, [fetchUser]);
 
   return (
     <UserContext.Provider
       value={{
         ...state,
-        handleFetchUser,
-        handleClearUser,
+        fetchUser,
       }}
     >
       {children}

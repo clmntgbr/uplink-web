@@ -1,3 +1,9 @@
+"use client";
+
+import { useUser } from "@/lib/user/context";
+
 export default function Page() {
-  return <div>Hello World</div>;
+  const { user } = useUser();
+
+  return <pre>{JSON.stringify(user, null, 2)}</pre>;
 }
