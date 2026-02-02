@@ -1,31 +1,32 @@
-import { betterAuth } from "better-auth";
+// Auth configuration and types
 
-export const auth = betterAuth({
-  emailAndPassword: {
-    enabled: true,
-    async signIn({ email, password }: { email: string; password: string }) {
-      const response = await fetch("https://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+// Cookie configuration
+export const AUTH_COOKIE_NAME = "auth_token";
+export const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-      if (!response.ok) {
-        throw new Error("Authentication failed");
-      }
+// Type for the session user
+export interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
+}
 
-      const { token, user } = await response.json();
+export interface Session {
+  token: string;
+  user: SessionUser;
+}
 
-      console.log(token, user);
+// Encode session data to base64
+export function encodeSession(session: Session): string {
+  return Buffer.from(JSON.stringify(session)).toString("base64");
+}
 
-      return {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          token: token
-        }
-      };
-    }
-  },
-});
+// Decode session data from base64
+export function decodeSession(encoded: string): Session | null {
+  try {
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    return JSON.parse(decoded) as Session;
+  } catch {
+    return null;
+  }
+}
