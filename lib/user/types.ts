@@ -6,3 +6,15 @@ export interface User {
   roles?: string[];
   id?: string;
 }
+
+export interface UserState {
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export type UserAction =
+  | { type: "SET_USER"; payload: User }
+  | { type: "SET_ERROR"; payload: string }
+  | { type: "SET_IS_LOADING"; payload: boolean }
+  | { type: "CLEAR_USER" };
