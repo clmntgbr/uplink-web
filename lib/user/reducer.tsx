@@ -21,13 +21,6 @@ export const userReducer = (state: UserState, action: UserAction): UserState => 
         ...state,
         isLoading: action.payload,
       };
-    case "CLEAR_USER":
-      return {
-        ...state,
-        user: null,
-        isLoading: false,
-        error: null,
-      };
     default:
       return state;
   }
