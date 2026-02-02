@@ -1,5 +1,5 @@
-import { User } from "@/lib/user/types";
 import { LoginPayload, RegisterPayload } from "@/lib/auth/types";
+import { User } from "@/lib/user/types";
 
 export const login = async (payload: LoginPayload): Promise<{ user: User; token: string }> => {
   const response = await fetch("/api/login", {
@@ -36,7 +36,7 @@ export const register = async (payload: RegisterPayload): Promise<{ user: User; 
 };
 
 export const logout = async (): Promise<void> => {
-  await fetch("/api/auth/logout", {
+  await fetch("/api/logout", {
     method: "POST",
   });
 };

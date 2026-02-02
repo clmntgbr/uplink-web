@@ -4,11 +4,10 @@ import { NextResponse } from "next/server";
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 export async function POST(request: Request) {
-  console.log(BACKEND_API_URL);
   try {
     const body = await request.json();
 
-    const response = await fetch(`${BACKEND_API_URL}/auth/login`, {
+    const response = await fetch(`${BACKEND_API_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +28,6 @@ export async function POST(request: Request) {
     const { id, email, firstname, lastname, picture, roles } = user;
     const nextResponse = NextResponse.json({
       user: { id, email, firstname, lastname, picture, roles },
-      token,
     });
 
     setSessionCookie(nextResponse, token);
