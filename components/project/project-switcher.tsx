@@ -82,11 +82,9 @@ export const ProjectSwitcher = () => {
                   </CommandItem>
                 ))}
               </CommandGroup>
-              <CommandSeparator />
             </CommandList>
-            <div className="p-1">
-              <CreateProject />
-            </div>
+            <CommandSeparator />
+            <CreateProject />
           </Command>
         </PopoverContent>
       </Popover>
