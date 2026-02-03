@@ -1,8 +1,12 @@
 "use client";
 
-import { Menu } from "./menu";
+import dynamic from "next/dynamic";
 import { ProjectSwitcher } from "./project/project-switcher";
 import { UserMenu } from "./user-menu";
+
+const Menu = dynamic(() => import("./menu").then((mod) => mod.Menu), {
+  ssr: false,
+});
 
 export function Header() {
   return (

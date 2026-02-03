@@ -1,13 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, X } from "lucide-react";
-import { useState, useSyncExternalStore } from "react";
-import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
-
-const emptySubscribe = () => () => {};
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -16,7 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useEndpoint } from "@/lib/endpoint/context";
 import { createEndpointSchema } from "@/lib/endpoint/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, X } from "lucide-react";
 import { HTTP_METHODS } from "next/dist/server/web/http";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
 type EndpointFormData = z.infer<typeof createEndpointSchema>;
 
@@ -33,12 +30,6 @@ interface CreateEndpointDialogProps {
 const DEFAULT_HEADERS: KeyValuePair[] = [{ key: "Content-Type", value: "application/json" }];
 
 export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps) {
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-
   const { createEndpoint } = useEndpoint();
 
   const [internalOpen, setInternalOpen] = useState(false);
@@ -142,15 +133,6 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       )}
     </Field>
   );
-
-  if (!mounted) {
-    return (
-      <Button variant="outline" size="sm" disabled>
-        <Plus className="size-4" />
-        Create Endpoint
-      </Button>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

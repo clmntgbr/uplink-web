@@ -10,7 +10,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -45,19 +44,7 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-const emptySubscribe = () => () => {};
-
 export function Menu() {
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-
-  if (!mounted) {
-    return <div className="h-9" />;
-  }
-
   return (
     <NavigationMenu>
       <NavigationMenuList>
