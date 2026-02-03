@@ -7,9 +7,10 @@ import { Command, CommandGroup, CommandInput, CommandItem, CommandList, CommandS
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useProject } from "@/lib/project/context";
 import { Project } from "@/lib/project/types";
-import { ChevronsUpDownIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
+import { ChevronsUpDownIcon, CircleCheckIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Skeleton } from "../ui/skeleton";
+import { CreateProject } from "./create-project";
 
 export const ProjectSwitcher = () => {
   const { projects, project, updateProject } = useProject();
@@ -82,13 +83,10 @@ export const ProjectSwitcher = () => {
                 ))}
               </CommandGroup>
               <CommandSeparator />
-              <CommandGroup>
-                <Button variant="ghost" className="w-full justify-start font-normal">
-                  <PlusIcon className="-ms-2 opacity-60" aria-hidden="true" />
-                  New project
-                </Button>
-              </CommandGroup>
             </CommandList>
+            <div className="p-1">
+              <CreateProject />
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
