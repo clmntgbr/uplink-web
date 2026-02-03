@@ -13,6 +13,16 @@ export interface ProjectState {
   error: string | null;
 }
 
+export interface CreateProjectPayload {
+  name: string;
+}
+
+export interface UpdateProjectPayload {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
 export type ProjectAction =
   | { type: "SET_PROJECTS"; payload: Hydra<Project>; project: Project | null }
   | { type: "SET_ERROR"; payload: string }

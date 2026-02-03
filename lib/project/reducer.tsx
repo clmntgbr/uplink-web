@@ -13,13 +13,6 @@ export const ProjectReducer = (state: ProjectState, action: ProjectAction): Proj
     case "SET_ERROR":
       return {
         ...state,
-        projects: {
-          member: [],
-          currentPage: 0,
-          itemsPerPage: 0,
-          totalPages: 0,
-          totalItems: 0,
-        },
         isLoading: false,
         error: action.payload,
       };
