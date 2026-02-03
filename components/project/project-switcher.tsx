@@ -9,6 +9,7 @@ import { useProject } from "@/lib/project/context";
 import { Project } from "@/lib/project/types";
 import { ChevronsUpDownIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Skeleton } from "../ui/skeleton";
 
 export const ProjectSwitcher = () => {
   const { projects, project, updateProject } = useProject();
@@ -22,11 +23,15 @@ export const ProjectSwitcher = () => {
   }, [project]);
 
   const handleUpdateProject = (project: Project) => {
-    updateProject({ id: project.id, name: project.name, isActive: true });
+    updateProject({ id: project.id, name: project.name, active: !project.isActive });
   };
 
   if (!selectProject) {
-    return null;
+    return (
+      <div className="w-auto max-w-xs">
+        <Skeleton className="w-48 h-8 rounded-md" />
+      </div>
+    );
   }
 
   return (

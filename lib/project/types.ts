@@ -20,7 +20,7 @@ export interface CreateProjectPayload {
 export interface UpdateProjectPayload {
   id: string;
   name: string;
-  isActive: boolean;
+  active: boolean;
 }
 
 export type ProjectAction =

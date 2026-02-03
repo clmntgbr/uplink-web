@@ -1,5 +1,4 @@
 import { Header } from "@/components/header";
-import { Logout } from "@/components/logout";
 import { Toaster } from "@/components/ui/sonner";
 import { EndpointProvider } from "@/lib/endpoint/provider";
 import { ProjectProvider } from "@/lib/project/provider";
@@ -18,11 +17,8 @@ export default function PrivateLayout({
         <ProjectProvider>
           <EndpointProvider>
             <WorkflowProvider>
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 pb-16">
-                <Header />
-                <Logout />
-                {children}
-              </div>
+              <Header />
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 pb-16">{children}</div>
               <Toaster richColors expand={false} position="top-right" closeButton />
             </WorkflowProvider>
           </EndpointProvider>
