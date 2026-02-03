@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+
+const emptySubscribe = () => () => {};
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -31,6 +33,12 @@ interface CreateEndpointDialogProps {
 const DEFAULT_HEADERS: KeyValuePair[] = [{ key: "Content-Type", value: "application/json" }];
 
 export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps) {
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
   const { createEndpoint } = useEndpoint();
 
   const [internalOpen, setInternalOpen] = useState(false);
@@ -134,6 +142,15 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       )}
     </Field>
   );
+
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        <Plus className="size-4" />
+        Create Endpoint
+      </Button>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
