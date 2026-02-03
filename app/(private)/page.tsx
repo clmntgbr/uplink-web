@@ -7,7 +7,6 @@ export default function Page() {
   const { endpoints } = useEndpoint();
   return (
     <>
-      <pre>{JSON.stringify(endpoints, null, 2)}</pre>
       <CreateEndpoint />
     </>
   );

@@ -28,6 +28,8 @@ interface CreateEndpointDialogProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+const DEFAULT_HEADERS: KeyValuePair[] = [{ key: "Content-Type", value: "application/json" }];
+
 export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps) {
   const { createEndpoint } = useEndpoint();
 
@@ -36,7 +38,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   const isOpen = isControlled ? open : internalOpen;
   const setIsOpen = isControlled ? onOpenChange! : setInternalOpen;
 
-  const [headers, setHeaders] = useState<KeyValuePair[]>([]);
+  const [headers, setHeaders] = useState<KeyValuePair[]>([...DEFAULT_HEADERS]);
 
   const form = useForm<EndpointFormData>({
     resolver: zodResolver(createEndpointSchema),
@@ -80,7 +82,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     await createEndpoint(payload);
     setIsOpen(false);
     form.reset();
-    setHeaders([]);
+    setHeaders([...DEFAULT_HEADERS]);
   }
 
   function onError() {}
@@ -88,7 +90,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   const handleCancel = () => {
     setIsOpen(false);
     form.reset();
-    setHeaders([]);
+    setHeaders([...DEFAULT_HEADERS]);
   };
 
   const addKeyValue = (setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>) => {
@@ -115,7 +117,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       {pairs.length > 0 && (
         <div className="space-y-2">
           {pairs.map((pair, index) => (
-            <div key={index} className="flex gap-2">
+            <div key={index} className="flex items-center gap-2">
               <Input placeholder="Key" value={pair.key} onChange={(e) => updateKeyValue(setter, index, "key", e.target.value)} className="flex-1" />
               <Input
                 placeholder="Value"
