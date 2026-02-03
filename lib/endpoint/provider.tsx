@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+import { useProject } from "../project/context";
 import { createEndpoint as createEndpointApi, getEndpoints } from "./api";
 import { EndpointContext } from "./context";
 import { EndpointReducer } from "./reducer";
@@ -20,6 +21,7 @@ const initialState: EndpointState = {
 
 export function EndpointProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(EndpointReducer, initialState);
+  const { project } = useProject();
 
   const fetchEndpoints = useCallback(async () => {
     try {
@@ -48,9 +50,12 @@ export function EndpointProvider({ children }: { children: React.ReactNode }) {
     [fetchEndpoints]
   );
 
+  // Re-fetch endpoints when the active project changes
   useEffect(() => {
-    fetchEndpoints();
-  }, [fetchEndpoints]);
+    if (project?.id) {
+      fetchEndpoints();
+    }
+  }, [fetchEndpoints, project?.id]);
 
   return (
     <EndpointContext.Provider

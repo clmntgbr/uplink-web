@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+import { useProject } from "../project/context";
 import { getWorkflows } from "./api";
 import { WorkflowContext } from "./context";
 import { WorkflowReducer } from "./reducer";
@@ -20,6 +21,7 @@ const initialState: WorkflowState = {
 
 export function WorkflowProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(WorkflowReducer, initialState);
+  const { project } = useProject();
 
   const fetchWorkflows = useCallback(async () => {
     try {
@@ -33,9 +35,12 @@ export function WorkflowProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Re-fetch workflows when the active project changes
   useEffect(() => {
-    fetchWorkflows();
-  }, [fetchWorkflows]);
+    if (project?.id) {
+      fetchWorkflows();
+    }
+  }, [fetchWorkflows, project?.id]);
 
   return (
     <WorkflowContext.Provider
