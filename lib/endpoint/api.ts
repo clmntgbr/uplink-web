@@ -13,7 +13,7 @@ export const getEndpoints = async (): Promise<Hydra<Endpoint>> => {
   return response.json();
 };
 
-export const createEndpoint = async (payload: CreateEndpointPayload): Promise<void> => {
+export const postEndpoint = async (payload: CreateEndpointPayload): Promise<void> => {
   const response = await fetch("/api/endpoints", {
     method: "POST",
     headers: {

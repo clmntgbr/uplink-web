@@ -13,3 +13,13 @@ export interface Hydra<TData> {
   totalItems: number;
   view?: HydraView;
 }
+
+export const initHydra = <TData>(): Hydra<TData> => {
+  return {
+    member: [],
+    currentPage: 0,
+    itemsPerPage: 0,
+    totalPages: 0,
+    totalItems: 0,
+  };
+};

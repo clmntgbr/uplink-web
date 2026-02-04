@@ -1,4 +1,5 @@
-import { EndpointAction, EndpointState } from "./types";
+import { initHydra } from "../hydra";
+import { Endpoint, EndpointAction, EndpointState } from "./types";
 
 export const EndpointReducer = (state: EndpointState, action: EndpointAction): EndpointState => {
   switch (action.type) {
@@ -12,13 +13,7 @@ export const EndpointReducer = (state: EndpointState, action: EndpointAction): E
     case "SET_ERROR":
       return {
         ...state,
-        endpoints: {
-          member: [],
-          currentPage: 0,
-          itemsPerPage: 0,
-          totalPages: 0,
-          totalItems: 0,
-        },
+        endpoints: initHydra<Endpoint>(),
         isLoading: false,
         error: action.payload,
       };

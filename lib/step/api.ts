@@ -1,0 +1,31 @@
+import { Hydra } from "@/lib/hydra";
+import { CreateStepPayload, Step } from "./types";
+
+export const getSteps = async (workflowId: string): Promise<Hydra<Step>> => {
+  const response = await fetch(`/api/steps?workflow=${workflowId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch steps");
+  }
+
+  return response.json();
+};
+
+export const postStep = async (payload: CreateStepPayload): Promise<void> => {
+  const response = await fetch("/api/steps", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create step");
+  }
+};

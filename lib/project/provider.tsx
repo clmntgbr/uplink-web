@@ -1,19 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+import { initHydra } from "../hydra";
 import { getProjects, postProject, putProject } from "./api";
 import { ProjectContext } from "./context";
 import { ProjectReducer } from "./reducer";
-import { CreateProjectPayload, ProjectState, UpdateProjectPayload } from "./types";
+import { CreateProjectPayload, Project, ProjectState, UpdateProjectPayload } from "./types";
 
 const initialState: ProjectState = {
-  projects: {
-    member: [],
-    currentPage: 0,
-    itemsPerPage: 0,
-    totalPages: 0,
-    totalItems: 0,
-  },
+  projects: initHydra<Project>(),
   project: null,
   isLoading: false,
   error: null,

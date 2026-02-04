@@ -1,20 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+import { initHydra } from "../hydra";
 import { useProject } from "../project/context";
-import { createEndpoint as createEndpointApi, getEndpoints } from "./api";
+import { getEndpoints, postEndpoint } from "./api";
 import { EndpointContext } from "./context";
 import { EndpointReducer } from "./reducer";
-import { CreateEndpointPayload, EndpointState } from "./types";
+import { CreateEndpointPayload, Endpoint, EndpointState } from "./types";
 
 const initialState: EndpointState = {
-  endpoints: {
-    member: [],
-    currentPage: 0,
-    itemsPerPage: 0,
-    totalPages: 0,
-    totalItems: 0,
-  },
+  endpoints: initHydra<Endpoint>(),
   isLoading: false,
   error: null,
 };
@@ -39,7 +34,7 @@ export function EndpointProvider({ children }: { children: React.ReactNode }) {
     async (payload: CreateEndpointPayload) => {
       try {
         dispatch({ type: "SET_LOADING", payload: true });
-        await createEndpointApi(payload);
+        await postEndpoint(payload);
         await fetchEndpoints();
       } catch {
         dispatch({ type: "SET_ERROR", payload: "Failed to create endpoint" });
@@ -50,7 +45,6 @@ export function EndpointProvider({ children }: { children: React.ReactNode }) {
     [fetchEndpoints]
   );
 
-  // Re-fetch endpoints when the active project changes
   useEffect(() => {
     if (project?.id) {
       fetchEndpoints();

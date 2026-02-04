@@ -1,20 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+import { initHydra } from "../hydra";
 import { useProject } from "../project/context";
 import { getWorkflows } from "./api";
 import { WorkflowContext } from "./context";
 import { WorkflowReducer } from "./reducer";
-import { WorkflowState } from "./types";
+import { Workflow, WorkflowState } from "./types";
 
 const initialState: WorkflowState = {
-  workflows: {
-    member: [],
-    currentPage: 0,
-    itemsPerPage: 0,
-    totalPages: 0,
-    totalItems: 0,
-  },
+  workflows: initHydra<Workflow>(),
   isLoading: false,
   error: null,
 };
@@ -35,7 +30,6 @@ export function WorkflowProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Re-fetch workflows when the active project changes
   useEffect(() => {
     if (project?.id) {
       fetchWorkflows();
