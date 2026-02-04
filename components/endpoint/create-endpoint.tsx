@@ -109,6 +109,79 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     setter((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
+  const parseQueryString = (queryString: string): KeyValuePair[] => {
+    const params: KeyValuePair[] = [];
+    if (queryString) {
+      const pairs = queryString.split("&");
+      for (const pair of pairs) {
+        const [key, value = ""] = pair.split("=");
+        if (key) {
+          params.push({ key: decodeURIComponent(key), value: decodeURIComponent(value) });
+        }
+      }
+    }
+    return params;
+  };
+
+  const addQueryParams = (params: KeyValuePair[]) => {
+    if (params.length > 0) {
+      setQuery((prev) => {
+        const existingKeys = new Set(prev.map((p) => p.key));
+        const newParams = params.filter((p) => !existingKeys.has(p.key));
+        return [...prev, ...newParams];
+      });
+    }
+  };
+
+  const parseUrl = (url: string): { baseUri: string; path: string; params: KeyValuePair[] } => {
+    const templateMatch = url.match(/^(\{\{[^}]+\}\})(.*)/);
+    if (templateMatch) {
+      const [, template, rest] = templateMatch;
+      const { path, params } = parsePathAndQuery(rest);
+      return { baseUri: template, path, params };
+    }
+
+    try {
+      const parsed = new URL(url);
+      const baseUri = `${parsed.protocol}//${parsed.host}`;
+      const path = parsed.pathname || "/";
+      const params = parseQueryString(parsed.search.substring(1));
+      return { baseUri, path, params };
+    } catch {
+      return { baseUri: url, path: "", params: [] };
+    }
+  };
+
+  const parsePathAndQuery = (pathWithQuery: string): { path: string; params: KeyValuePair[] } => {
+    const queryIndex = pathWithQuery.indexOf("?");
+    if (queryIndex === -1) {
+      return { path: pathWithQuery || "/", params: [] };
+    }
+    const path = pathWithQuery.substring(0, queryIndex) || "/";
+    const params = parseQueryString(pathWithQuery.substring(queryIndex + 1));
+    return { path, params };
+  };
+
+  const handleBaseUriChange = (value: string, onChange: (value: string) => void) => {
+    const { baseUri, path, params } = parseUrl(value);
+
+    if (path && path !== "/") {
+      const currentPath = form.getValues("path");
+      if (!currentPath || currentPath === "/") {
+        form.setValue("path", path);
+      }
+    }
+
+    addQueryParams(params);
+    onChange(baseUri);
+  };
+
+  const handlePathChange = (value: string, onChange: (value: string) => void) => {
+    const { path, params } = parsePathAndQuery(value);
+    addQueryParams(params);
+    onChange(params.length > 0 ? path : value);
+  };
+
   const renderKeyValueFields = (label: string, pairs: KeyValuePair[], setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>) => (
     <Field>
       <div className="flex items-center justify-between">
@@ -180,10 +253,16 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                   <Controller
                     name="baseUri"
                     control={form.control}
-                    render={({ field, fieldState }) => (
+                    render={({ field: { onChange, ...field }, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="endpoint-baseUri">Base URI</FieldLabel>
-                        <Input {...field} id="endpoint-baseUri" placeholder="https://api.example.com" aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id="endpoint-baseUri"
+                          placeholder="https://api.example.com"
+                          aria-invalid={fieldState.invalid}
+                          onChange={(e) => handleBaseUriChange(e.target.value, onChange)}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -192,10 +271,16 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                   <Controller
                     name="path"
                     control={form.control}
-                    render={({ field, fieldState }) => (
+                    render={({ field: { onChange, ...field }, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="endpoint-path">Path</FieldLabel>
-                        <Input {...field} id="endpoint-path" placeholder="/api/v1/users" aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id="endpoint-path"
+                          placeholder="/api/v1/users?page=1"
+                          aria-invalid={fieldState.invalid}
+                          onChange={(e) => handlePathChange(e.target.value, onChange)}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
