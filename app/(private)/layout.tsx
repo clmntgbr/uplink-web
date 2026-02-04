@@ -20,7 +20,7 @@ export default function PrivateLayout({
             <WorkflowProvider>
               <StepProvider>
                 <Header />
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 pb-16">{children}</div>
+                <div className="max-w-7xl mx-auto px-4">{children}</div>
                 <Toaster richColors expand={false} position="top-right" closeButton />
               </StepProvider>
             </WorkflowProvider>

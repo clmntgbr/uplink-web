@@ -1,11 +1,14 @@
 "use client";
 
-import { CreateEndpoint } from "@/components/endpoint/create-endpoint";
+import data from "@/components/workflow/data.json";
+import { WorkflowTitle } from "@/components/workflow/title";
+import { DataTable } from "@/components/workflow/workflow-table";
 
 export default function Page() {
   return (
     <>
-      <CreateEndpoint />
+      <WorkflowTitle />
+      <DataTable data={data} />
     </>
   );
 }
