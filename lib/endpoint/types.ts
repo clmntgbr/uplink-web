@@ -20,6 +20,7 @@ export interface CreateEndpointPayload {
   timeoutSeconds: number;
   header: Record<string, string>;
   body: Record<string, string>;
+  query: Record<string, string>;
 }
 
 export interface EndpointState {

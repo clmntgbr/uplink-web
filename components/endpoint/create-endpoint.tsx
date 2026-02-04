@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useEndpoint } from "@/lib/endpoint/context";
 import { createEndpointSchema } from "@/lib/endpoint/schema";
@@ -38,6 +39,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   const setIsOpen = isControlled ? onOpenChange! : setInternalOpen;
 
   const [headers, setHeaders] = useState<KeyValuePair[]>([...DEFAULT_HEADERS]);
+  const [query, setQuery] = useState<KeyValuePair[]>([]);
 
   const form = useForm<EndpointFormData>({
     resolver: zodResolver(createEndpointSchema),
@@ -75,6 +77,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       method: data.method,
       timeoutSeconds: data.timeoutSeconds,
       header: keyValueToRecord(headers),
+      query: keyValueToRecord(query),
       body: bodyObj,
     };
 
@@ -82,6 +85,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     setIsOpen(false);
     form.reset();
     setHeaders([...DEFAULT_HEADERS]);
+    setQuery([]);
   }
 
   function onError() {}
@@ -90,6 +94,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     setIsOpen(false);
     form.reset();
     setHeaders([...DEFAULT_HEADERS]);
+    setQuery([]);
   };
 
   const addKeyValue = (setter: React.Dispatch<React.SetStateAction<KeyValuePair[]>>) => {
@@ -142,116 +147,135 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
           Create Endpoint
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl min-h-[450px] max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Create Endpoint</DialogTitle>
           <DialogDescription>Configure a new API endpoint to monitor.</DialogDescription>
         </DialogHeader>
 
-        <form id="create-endpoint-form" onSubmit={form.handleSubmit(onSubmit, onError)}>
-          <FieldGroup>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="endpoint-name">Name</FieldLabel>
-                  <Input {...field} id="endpoint-name" placeholder="My API Endpoint" aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+        <form id="create-endpoint-form" onSubmit={form.handleSubmit(onSubmit, onError)} className="flex flex-col flex-1 min-h-0">
+          <Tabs defaultValue="configuration" className="w-full flex flex-col flex-1 min-h-0 gap-4">
+            <TabsList className="w-full shrink-0">
+              <TabsTrigger value="configuration">Configuration</TabsTrigger>
+              <TabsTrigger value="queries">Query</TabsTrigger>
+              <TabsTrigger value="headers">Header</TabsTrigger>
+              <TabsTrigger value="body">Body</TabsTrigger>
+            </TabsList>
 
-            <div className="grid grid-cols-2 gap-4">
+            <TabsContent value="configuration" className="mt-0 flex-1 overflow-y-auto">
+              <FieldGroup>
+                <Controller
+                  name="name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="endpoint-name">Name</FieldLabel>
+                      <Input {...field} id="endpoint-name" placeholder="My API Endpoint" aria-invalid={fieldState.invalid} />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Controller
+                    name="baseUri"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="endpoint-baseUri">Base URI</FieldLabel>
+                        <Input {...field} id="endpoint-baseUri" placeholder="https://api.example.com" aria-invalid={fieldState.invalid} />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="path"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="endpoint-path">Path</FieldLabel>
+                        <Input {...field} id="endpoint-path" placeholder="/api/v1/users" aria-invalid={fieldState.invalid} />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Controller
+                    name="method"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="endpoint-method">Method</FieldLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger id="endpoint-method" className="w-full" aria-invalid={fieldState.invalid}>
+                            <SelectValue placeholder="Select method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {HTTP_METHODS.map((method) => (
+                              <SelectItem key={method} value={method}>
+                                {method}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="timeoutSeconds"
+                    control={form.control}
+                    render={({ field: { onChange, ...field }, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="endpoint-timeout">Timeout (seconds)</FieldLabel>
+                        <Input
+                          {...field}
+                          id="endpoint-timeout"
+                          type="number"
+                          placeholder="30"
+                          aria-invalid={fieldState.invalid}
+                          onChange={(e) => onChange(e.target.valueAsNumber)}
+                        />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+                </div>
+              </FieldGroup>
+            </TabsContent>
+
+            <TabsContent value="queries" className="mt-0 flex-1 overflow-y-auto">
+              {renderKeyValueFields("Query Parameters", query, setQuery)}
+            </TabsContent>
+
+            <TabsContent value="headers" className="mt-0 flex-1 overflow-y-auto">
+              {renderKeyValueFields("Header", headers, setHeaders)}
+            </TabsContent>
+
+            <TabsContent value="body" className="mt-0 flex-1 overflow-y-auto">
               <Controller
-                name="baseUri"
+                name="body"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="endpoint-baseUri">Base URI</FieldLabel>
-                    <Input {...field} id="endpoint-baseUri" placeholder="https://api.example.com" aria-invalid={fieldState.invalid} />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="path"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="endpoint-path">Path</FieldLabel>
-                    <Input {...field} id="endpoint-path" placeholder="/api/v1/users" aria-invalid={fieldState.invalid} />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="method"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="endpoint-method">Method</FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger id="endpoint-method" className="w-full" aria-invalid={fieldState.invalid}>
-                        <SelectValue placeholder="Select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {HTTP_METHODS.map((method) => (
-                          <SelectItem key={method} value={method}>
-                            {method}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="timeoutSeconds"
-                control={form.control}
-                render={({ field: { onChange, ...field }, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="endpoint-timeout">Timeout (seconds)</FieldLabel>
-                    <Input
+                    <FieldLabel htmlFor="endpoint-body">Body (JSON)</FieldLabel>
+                    <Textarea
                       {...field}
-                      id="endpoint-timeout"
-                      type="number"
-                      placeholder="30"
+                      id="endpoint-body"
+                      placeholder='{"key": "value"}'
+                      className="font-mono text-xs min-h-[200px]"
                       aria-invalid={fieldState.invalid}
-                      onChange={(e) => onChange(e.target.valueAsNumber)}
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
-            </div>
-
-            {renderKeyValueFields("Headers", headers, setHeaders)}
-
-            <Controller
-              name="body"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="endpoint-body">Body (JSON)</FieldLabel>
-                  <Textarea
-                    {...field}
-                    id="endpoint-body"
-                    placeholder='{"key": "value"}'
-                    className="font-mono text-xs min-h-[120px]"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
+            </TabsContent>
+          </Tabs>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="ghost" onClick={handleCancel}>
