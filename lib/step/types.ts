@@ -1,6 +1,12 @@
+import { Endpoint } from "@/lib/endpoint/types";
+
 export interface Step {
   id: string;
   position: number;
+  endpoint: Endpoint;
+  variables: Record<string, string>;
+  asserts: Record<string, string>;
+  outputs: Record<string, string>;
 }
 
 export interface CreateStepPayload {

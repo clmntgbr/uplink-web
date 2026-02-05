@@ -5,14 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { WorkflowStepItem } from "@/components/workflow/workflow-step";
 import { Hydra, initHydra } from "@/lib/hydra";
 import { useStep } from "@/lib/step/context";
 import { Step } from "@/lib/step/types";
 import { useWorkflow } from "@/lib/workflow/context";
 import { Workflow } from "@/lib/workflow/types";
+import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { FileText, Layers, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function Page() {
   const { fetchSteps } = useStep();
@@ -20,6 +24,39 @@ export default function Page() {
   const [steps, setSteps] = useState<Hydra<Step>>(initHydra<Step>());
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
   const params = useParams();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = steps.member.findIndex((item) => item.id === active.id);
+      const newIndex = steps.member.findIndex((item) => item.id === over.id);
+
+      const newItems = steps.member.splice(newIndex, 0, steps.member.splice(oldIndex, 1)[0]);
+
+      setSteps((prev) => ({
+        ...prev,
+        member: newItems,
+      }));
+
+      toast.success("Step order updated");
+    }
+  };
+
+  const handleDeleteStep = (stepId: string) => {
+    toast.success("Step deleted");
+  };
+
+  const handleEditStep = (step: Step) => {
+    toast.success("Step edited");
+  };
 
   useEffect(() => {
     fetchSteps(params.id as string).then((steps) => {
@@ -50,7 +87,12 @@ export default function Page() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="workflow-name">Name</Label>
-                  <Input id="workflow-name" value={workflow.name} placeholder="e.g., User Registration Flow" />
+                  <Input
+                    id="workflow-name"
+                    value={workflow.name}
+                    onChange={(e) => setWorkflow({ ...workflow, name: e.target.value })}
+                    placeholder="e.g., User Registration Flow"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -58,6 +100,7 @@ export default function Page() {
                   <Textarea
                     id="workflow-description"
                     value={workflow.description || ""}
+                    onChange={(e) => setWorkflow({ ...workflow, description: e.target.value })}
                     placeholder="Describe what this workflow tests..."
                     rows={4}
                   />
@@ -118,6 +161,20 @@ export default function Page() {
                 Add Step
               </Button>
             </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={steps.member.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {steps.member.map((step) => (
+                    <WorkflowStepItem
+                      key={step.position}
+                      step={step}
+                      onEdit={() => handleEditStep(step)}
+                      onDelete={() => handleDeleteStep(step.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       </main>
