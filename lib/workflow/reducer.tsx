@@ -1,4 +1,5 @@
-import { WorkflowAction, WorkflowState } from "./types";
+import { initHydra } from "../hydra";
+import { Workflow, WorkflowAction, WorkflowState } from "./types";
 
 export const WorkflowReducer = (state: WorkflowState, action: WorkflowAction): WorkflowState => {
   switch (action.type) {
@@ -12,13 +13,7 @@ export const WorkflowReducer = (state: WorkflowState, action: WorkflowAction): W
     case "SET_ERROR":
       return {
         ...state,
-        workflows: {
-          member: [],
-          currentPage: 0,
-          itemsPerPage: 0,
-          totalPages: 0,
-          totalItems: 0,
-        },
+        workflows: initHydra<Workflow>(),
         isLoading: false,
         error: action.payload,
       };

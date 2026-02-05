@@ -3,6 +3,7 @@ import { Hydra } from "@/lib/hydra";
 export interface Workflow {
   id: string;
   name: string;
+  description?: string;
 }
 
 export interface WorkflowState {

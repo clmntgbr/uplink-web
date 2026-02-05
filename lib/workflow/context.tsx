@@ -1,10 +1,11 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { WorkflowState } from "./types";
+import { Workflow, WorkflowState } from "./types";
 
 export interface WorkflowContextType extends WorkflowState {
   fetchWorkflows: () => Promise<void>;
+  fetchWorkflow: (id: string) => Promise<Workflow>;
 }
 
 export const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);

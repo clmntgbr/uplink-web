@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { initHydra } from "../hydra";
 import { useProject } from "../project/context";
-import { getWorkflows } from "./api";
+import { getWorkflow, getWorkflows } from "./api";
 import { WorkflowContext } from "./context";
 import { WorkflowReducer } from "./reducer";
 import { Workflow, WorkflowState } from "./types";
@@ -30,6 +30,19 @@ export function WorkflowProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const fetchWorkflow = useCallback(async (workflowId: string): Promise<Workflow> => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const workflow = await getWorkflow(workflowId);
+      return workflow;
+    } catch {
+      dispatch({ type: "SET_ERROR", payload: "Failed to fetch workflow" });
+      throw new Error("Failed to fetch workflow");
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }, []);
+
   useEffect(() => {
     if (project?.id) {
       fetchWorkflows();
@@ -41,6 +54,7 @@ export function WorkflowProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...state,
         fetchWorkflows,
+        fetchWorkflow,
       }}
     >
       {children}

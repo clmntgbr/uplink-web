@@ -12,3 +12,15 @@ export const getWorkflows = async (): Promise<Hydra<Workflow>> => {
 
   return response.json();
 };
+
+export const getWorkflow = async (id: string): Promise<Workflow> => {
+  const response = await fetch(`/api/workflows/${id}`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch workflow");
+  }
+
+  return response.json();
+};
