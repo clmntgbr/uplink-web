@@ -6,7 +6,6 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { useEndpoint } from "@/lib/endpoint/context";
 import { createEndpointSchema } from "@/lib/endpoint/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,9 +13,11 @@ import { Plus, X } from "lucide-react";
 import { HTTP_METHODS } from "next/dist/server/web/http";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
+import { JsonEditor } from "../json-editor";
 
-type EndpointFormData = z.infer<typeof createEndpointSchema>;
+type EndpointFormData = z.input<typeof createEndpointSchema>;
 
 interface KeyValuePair {
   key: string;
@@ -49,7 +50,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       path: "",
       method: "GET",
       timeoutSeconds: 30,
-      body: "",
+      body: {},
     },
   });
 
@@ -61,15 +62,6 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   };
 
   async function onSubmit(data: EndpointFormData) {
-    let bodyObj: Record<string, string> = {};
-    if (data.body && data.body.trim()) {
-      try {
-        bodyObj = JSON.parse(data.body);
-      } catch {
-        // Already validated by zod
-      }
-    }
-
     const payload = {
       name: data.name,
       baseUri: data.baseUri,
@@ -78,7 +70,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       timeoutSeconds: data.timeoutSeconds,
       header: keyValueToRecord(headers),
       query: keyValueToRecord(query),
-      body: bodyObj,
+      body: data.body || {},
     };
 
     await createEndpoint(payload);
@@ -88,7 +80,11 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
     setQuery([]);
   }
 
-  function onError() {}
+  function onError() {
+    toast.error("Invalid Form", {
+      description: "Some fields are invalid. Please check them and try again.",
+    });
+  }
 
   const handleCancel = () => {
     setIsOpen(false);
@@ -347,13 +343,16 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="endpoint-body">Body (JSON)</FieldLabel>
-                    <Textarea
-                      {...field}
-                      id="endpoint-body"
-                      placeholder='{"key": "value"}'
-                      className="font-mono text-xs min-h-[200px]"
-                      aria-invalid={fieldState.invalid}
+                    <FieldLabel htmlFor="endpoint-body">Body</FieldLabel>
+                    <JsonEditor
+                      value={field.value as Record<string, string>}
+                      onChange={(jsonString) => {
+                        try {
+                          const parsed = JSON.parse(jsonString);
+                          field.onChange(parsed);
+                        } catch {}
+                      }}
+                      height="100px"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
