@@ -6,7 +6,7 @@ export interface Step {
   endpoint: Endpoint;
   variables: Record<string, string>;
   asserts: Record<string, string>;
-  outputs: Record<string, string>;
+  response: Record<string, unknown>;
 }
 
 export interface CreateStepPayload {

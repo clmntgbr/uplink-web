@@ -1,6 +1,7 @@
 "use client";
 
 import { CreateEndpoint } from "@/components/endpoint/create-endpoint";
+import { EmptySteps } from "@/components/step/empty-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ import { useWorkflow } from "@/lib/workflow/context";
 import { Workflow } from "@/lib/workflow/types";
 import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { FileText, Layers, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -86,12 +87,6 @@ export default function Page() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Workflow Details
-                </CardTitle>
-              </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="workflow-name">Name</Label>
@@ -145,7 +140,7 @@ export default function Page() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                    Expand steps to configure outputs and assertions
+                    Expand steps to configure responses and assertions
                   </li>
                 </ul>
               </CardContent>
@@ -155,15 +150,7 @@ export default function Page() {
           {/* Right Panel - Steps Builder */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold">Steps</h2>
-                  <p className="text-sm text-muted-foreground">Define the steps of the workflow</p>
-                </div>
-              </div>
+              <div className="flex items-center gap-3"></div>
               <div className="flex items-center gap-3">
                 <Button size="sm">
                   <Plus className="size-4" />
@@ -172,21 +159,25 @@ export default function Page() {
                 <CreateEndpoint />
               </div>
             </div>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={steps.member.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-4">
-                  {steps.member.map((step) => (
-                    <StepCard
-                      key={step.id}
-                      step={step}
-                      endpoint={step.endpoint}
-                      onUpdate={(updates) => updateStep(step.id, updates)}
-                      onDelete={() => deleteStep(step.id)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            {steps.member.length === 0 ? (
+              <EmptySteps />
+            ) : (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={steps.member.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {steps.member.map((step) => (
+                      <StepCard
+                        key={step.id}
+                        step={step}
+                        endpoint={step.endpoint}
+                        onUpdate={(updates) => updateStep(step.id, updates)}
+                        onDelete={() => deleteStep(step.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            )}
           </div>
         </div>
       </main>

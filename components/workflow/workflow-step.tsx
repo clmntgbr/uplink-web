@@ -92,16 +92,18 @@ export function StepCard({ step, endpoint, onUpdate, onDelete }: StepCardProps) 
                   <span className="w-2 h-2 rounded-full bg-info" />
                   Variables
                 </label>
-                <JsonEditor value={step.variables} onChange={(value) => onUpdate({ variables: JSON.parse(value) })} height="100px" />
+                <JsonEditor value={step.variables} onChange={(value) => onUpdate({ variables: JSON.parse(value) })} />
               </div>
 
-              {/* Outputs */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-success" />
-                  Outputs
+                  Response
                 </label>
-                <JsonEditor value={step.outputs} onChange={(value) => onUpdate({ outputs: JSON.parse(value) })} height="100px" />
+                <JsonEditor
+                  value={step.response as Record<string, string>}
+                  onChange={(jsonString) => onUpdate({ response: JSON.parse(jsonString) })}
+                />
               </div>
 
               {/* Asserts */}
@@ -110,7 +112,7 @@ export function StepCard({ step, endpoint, onUpdate, onDelete }: StepCardProps) 
                   <span className="w-2 h-2 rounded-full bg-warning" />
                   Assertions
                 </label>
-                <JsonEditor value={step.asserts} onChange={(value) => onUpdate({ asserts: JSON.parse(value) })} height="100px" />
+                <JsonEditor value={step.asserts} onChange={(value) => onUpdate({ asserts: JSON.parse(value) })} />
               </div>
             </CardContent>
           </CollapsibleContent>

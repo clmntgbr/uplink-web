@@ -83,8 +83,14 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
   }
 
   function onError() {
-    toast.error("Invalid Form", {
-      description: "Some fields are invalid. Please check them and try again.",
+    toast("Some fields are invalid", {
+      description: "Please check them and try again.",
+      closeButton: false,
+      style: {
+        "--normal-bg": "light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))",
+        "--normal-text": "var(--color-white)",
+        "--normal-border": "transparent",
+      } as React.CSSProperties,
     });
   }
 
@@ -355,7 +361,6 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                           field.onChange(parsed);
                         } catch {}
                       }}
-                      height="100px"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -377,7 +382,6 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                           field.onChange(parsed);
                         } catch {}
                       }}
-                      height="100px"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>

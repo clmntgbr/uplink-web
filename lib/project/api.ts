@@ -19,6 +19,10 @@ export const postProject = async (payload: CreateProjectPayload): Promise<Projec
     body: JSON.stringify(payload),
   });
 
+  if (!response.ok) {
+    throw new Error("Failed to create project");
+  }
+
   return response.json();
 };
 
@@ -27,6 +31,10 @@ export const putProject = async (payload: UpdateProjectPayload): Promise<Project
     method: "PATCH",
     body: JSON.stringify(payload),
   });
+
+  if (!response.ok) {
+    throw new Error("Failed to update project");
+  }
 
   return response.json();
 };

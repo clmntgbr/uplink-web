@@ -1,5 +1,5 @@
 import { Hydra } from "@/lib/hydra";
-import { Workflow } from "./types";
+import { CreateWorkflowPayload, Workflow } from "./types";
 
 export const getWorkflows = async (): Promise<Hydra<Workflow>> => {
   const response = await fetch("/api/workflows", {
@@ -20,6 +20,22 @@ export const getWorkflow = async (id: string): Promise<Workflow> => {
 
   if (!response.ok) {
     throw new Error("Failed to fetch workflow");
+  }
+
+  return response.json();
+};
+
+export const postWorkflow = async (payload: CreateWorkflowPayload): Promise<Workflow> => {
+  const response = await fetch("/api/workflows", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create workflow");
   }
 
   return response.json();
