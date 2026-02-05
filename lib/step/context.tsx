@@ -7,6 +7,7 @@ import { CreateStepPayload, Step, StepState } from "./types";
 export interface StepContextType extends StepState {
   fetchSteps: (workflowId: string) => Promise<Hydra<Step>>;
   createStep: (payload: CreateStepPayload, workflowId: string) => Promise<void>;
+  updateStepPosition: (stepId: string, position: number, workflowId: string) => Promise<void>;
 }
 
 export const StepContext = createContext<StepContextType | undefined>(undefined);

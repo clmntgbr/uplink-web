@@ -10,4 +10,5 @@ export const createEndpointSchema = z.object({
   method: z.enum(httpMethodsTuple),
   timeoutSeconds: z.number().int().min(1, "Timeout must be at least 1 second").max(300, "Timeout must be at most 300 seconds"),
   body: z.record(z.string(), z.unknown()).default({}),
+  response: z.record(z.string(), z.unknown()).default({}),
 });

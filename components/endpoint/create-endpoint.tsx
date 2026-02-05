@@ -51,6 +51,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       method: "GET",
       timeoutSeconds: 30,
       body: {},
+      response: {},
     },
   });
 
@@ -71,6 +72,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
       header: keyValueToRecord(headers),
       query: keyValueToRecord(query),
       body: data.body || {},
+      response: data.response || {},
     };
 
     await createEndpoint(payload);
@@ -216,7 +218,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
           Create Endpoint
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl min-h-[450px] max-h-[90vh] flex flex-col overflow-hidden">
+      <DialogContent className="max-w-4xl min-h-[450px] max-h-[90vh] flex flex-col overflow-hidden min-w-[500px]">
         <DialogHeader>
           <DialogTitle>Create Endpoint</DialogTitle>
           <DialogDescription>Configure a new API endpoint to monitor.</DialogDescription>
@@ -229,6 +231,7 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
               <TabsTrigger value="queries">Query</TabsTrigger>
               <TabsTrigger value="headers">Header</TabsTrigger>
               <TabsTrigger value="body">Body</TabsTrigger>
+              <TabsTrigger value="response">Response</TabsTrigger>
             </TabsList>
 
             <TabsContent value="configuration" className="mt-0 flex-1 overflow-y-auto">
@@ -344,6 +347,28 @@ export function CreateEndpoint({ open, onOpenChange }: CreateEndpointDialogProps
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="endpoint-body">Body</FieldLabel>
+                    <JsonEditor
+                      value={field.value as Record<string, string>}
+                      onChange={(jsonString) => {
+                        try {
+                          const parsed = JSON.parse(jsonString);
+                          field.onChange(parsed);
+                        } catch {}
+                      }}
+                      height="100px"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </TabsContent>
+            <TabsContent value="response" className="mt-0 flex-1 overflow-y-auto">
+              <Controller
+                name="response"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="endpoint-response">Response</FieldLabel>
                     <JsonEditor
                       value={field.value as Record<string, string>}
                       onChange={(jsonString) => {

@@ -29,3 +29,17 @@ export const postStep = async (payload: CreateStepPayload): Promise<void> => {
     throw new Error("Failed to create step");
   }
 };
+
+export const patchStepPosition = async (stepId: string, position: number): Promise<void> => {
+  const response = await fetch(`/api/steps/${stepId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ position }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update step position");
+  }
+};
