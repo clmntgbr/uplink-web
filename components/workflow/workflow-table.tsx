@@ -53,18 +53,23 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useWorkflow } from "@/lib/workflow/context";
+import { Workflow } from "@/lib/workflow/types";
+import { useRouter } from "next/navigation";
 
 export const schema = z.object({
-  id: z.number(),
-  header: z.string(),
-  type: z.string(),
-  status: z.string(),
-  target: z.string(),
-  limit: z.string(),
-  reviewer: z.string(),
+  id: z.string(),
+  name: z.string(),
+  type: z.string().optional().default("Narrative"),
+  status: z.string().optional().default("Not Started"),
+  target: z.string().optional().default("0"),
+  limit: z.string().optional().default("0"),
+  reviewer: z.string().optional().default("Assign reviewer"),
 });
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+type WorkflowRow = z.infer<typeof schema>;
+
+const columns: ColumnDef<WorkflowRow>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -85,8 +90,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "header",
-    header: "Header",
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />;
     },
@@ -121,7 +126,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
+            loading: `Saving ${row.original.name}`,
             success: "Done",
             error: "Error",
           });
@@ -146,7 +151,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
+            loading: `Saving ${row.original.name}`,
             success: "Done",
             error: "Error",
           });
@@ -217,8 +222,22 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
 ];
 
-export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[] }) {
-  const [data, setData] = React.useState(() => initialData);
+export function WorkflowTable() {
+  const { workflows, error } = useWorkflow();
+
+  const initialData = React.useMemo(() => {
+    return workflows.member.map((workflow: Workflow) => ({
+      id: workflow.id,
+      name: workflow.name,
+      type: "Narrative",
+      status: "Not Started",
+      target: "0",
+      limit: "0",
+      reviewer: "Assign reviewer",
+    }));
+  }, [workflows.member]);
+
+  const [data, setData] = React.useState<WorkflowRow[]>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -227,6 +246,10 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
     pageIndex: 0,
     pageSize: 10,
   });
+
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map(({ id }) => id) || [], [data]);
 
@@ -240,7 +263,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row.id,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -264,6 +287,14 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
         return arrayMove(data, oldIndex, newIndex);
       });
     }
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8 text-destructive">
+        <span>Error: {error}</span>
+      </div>
+    );
   }
 
   return (
@@ -298,7 +329,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
+                    No workflows found.
                   </TableCell>
                 </TableRow>
               )}
@@ -398,19 +429,24 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
+function TableCellViewer({ item }: { item: WorkflowRow }) {
   const isMobile = useIsMobile();
+  const router = useRouter();
+
+  const editWorkflow = (item: WorkflowRow) => {
+    router.push(`/workflows/${item.id}`);
+  };
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.header}
+          {item.name}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.header}</DrawerTitle>
+          <DrawerTitle>{item.name}</DrawerTitle>
           <DrawerDescription>Showing total visitors for the last 6 months</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
@@ -447,8 +483,8 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           )}
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.header} />
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" defaultValue={item.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
@@ -509,7 +545,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           </form>
         </div>
         <DrawerFooter>
-          <Button>Submit</Button>
+          <Button onClick={() => editWorkflow(item)}>Edit workflow</Button>
           <DrawerClose asChild>
             <Button variant="outline">Done</Button>
           </DrawerClose>
