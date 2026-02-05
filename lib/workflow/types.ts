@@ -1,5 +1,4 @@
 import { Hydra } from "@/lib/hydra";
-import { z } from "zod";
 
 export interface Workflow {
   id: string;
@@ -17,11 +16,6 @@ export interface WorkflowState {
   isLoading: boolean;
   error: string | null;
 }
-
-export const createWorkflowSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
-});
 
 export type WorkflowAction =
   | { type: "SET_WORKFLOWS"; payload: Hydra<Workflow> }

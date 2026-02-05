@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useWorkflow } from "@/lib/workflow/context";
-import { createWorkflowSchema } from "@/lib/workflow/types";
+import { createWorkflowSchema } from "@/lib/workflow/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -15,11 +15,6 @@ import * as z from "zod";
 import { Textarea } from "../ui/textarea";
 
 type WorkflowFormData = z.input<typeof createWorkflowSchema>;
-
-interface KeyValuePair {
-  key: string;
-  value: string;
-}
 
 interface CreateWorkflowDialogProps {
   open?: boolean;
@@ -44,15 +39,24 @@ export function CreateWorkflow({ open, onOpenChange }: CreateWorkflowDialogProps
   });
 
   async function onSubmit(data: WorkflowFormData) {
-    await createWorkflow(data);
+    await createWorkflow({
+      name: data.name,
+      description: data.description || undefined,
+    });
     toast.success("Workflow created successfully");
     setIsOpen(false);
     form.reset();
   }
 
   function onError() {
-    toast.error("Invalid Form", {
-      description: "Some fields are invalid. Please check them and try again.",
+    toast("Some fields are invalid", {
+      description: "Please check them and try again.",
+      closeButton: false,
+      style: {
+        "--normal-bg": "light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))",
+        "--normal-text": "var(--color-white)",
+        "--normal-border": "transparent",
+      } as React.CSSProperties,
     });
   }
 
@@ -95,7 +99,13 @@ export function CreateWorkflow({ open, onOpenChange }: CreateWorkflowDialogProps
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="endpoint-description">Description</FieldLabel>
-                  <Textarea {...field} id="endpoint-description" placeholder="My API Workflow" aria-invalid={fieldState.invalid} />
+                  <Textarea
+                    {...field}
+                    id="endpoint-description"
+                    placeholder="My API Workflow"
+                    aria-invalid={fieldState.invalid}
+                    value={field.value || ""}
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
