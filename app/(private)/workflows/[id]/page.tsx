@@ -1,11 +1,12 @@
 "use client";
 
+import { CreateEndpoint } from "@/components/endpoint/create-endpoint";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { WorkflowStepItem } from "@/components/workflow/workflow-step";
+import { StepCard } from "@/components/workflow/workflow-step";
 import { Hydra, initHydra } from "@/lib/hydra";
 import { useStep } from "@/lib/step/context";
 import { Step } from "@/lib/step/types";
@@ -15,7 +16,7 @@ import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor,
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { FileText, Layers, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
@@ -31,6 +32,21 @@ export default function Page() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const updateStep = useCallback((stepId: string, updates: Partial<Step>) => {
+    setSteps((prev) => ({
+      ...prev,
+      member: prev.member.map((s) => (s.id === stepId ? { ...s, ...updates } : s)),
+    }));
+  }, []);
+
+  const deleteStep = useCallback((stepId: string) => {
+    setSteps((prev) => ({
+      ...prev,
+      member: prev.member.filter((s) => s.id !== stepId).map((s, i) => ({ ...s, position: i + 1 })),
+    }));
+    toast.success("Step removed");
+  }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -48,14 +64,6 @@ export default function Page() {
 
       toast.success("Step order updated");
     }
-  };
-
-  const handleDeleteStep = (stepId: string) => {
-    toast.success("Step deleted");
-  };
-
-  const handleEditStep = (step: Step) => {
-    toast.success("Step edited");
   };
 
   useEffect(() => {
@@ -156,20 +164,24 @@ export default function Page() {
                   <p className="text-sm text-muted-foreground">Define the steps of the workflow</p>
                 </div>
               </div>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Step
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button size="sm">
+                  <Plus className="size-4" />
+                  Create step
+                </Button>
+                <CreateEndpoint />
+              </div>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={steps.member.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {steps.member.map((step) => (
-                    <WorkflowStepItem
-                      key={step.position}
+                    <StepCard
+                      key={step.id}
                       step={step}
-                      onEdit={() => handleEditStep(step)}
-                      onDelete={() => handleDeleteStep(step.id)}
+                      endpoint={step.endpoint}
+                      onUpdate={(updates) => updateStep(step.id, updates)}
+                      onDelete={() => deleteStep(step.id)}
                     />
                   ))}
                 </div>

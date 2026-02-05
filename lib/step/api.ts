@@ -2,7 +2,7 @@ import { Hydra } from "@/lib/hydra";
 import { CreateStepPayload, Step } from "./types";
 
 export const getSteps = async (workflowId: string): Promise<Hydra<Step>> => {
-  const response = await fetch(`/api/steps?workflow=${workflowId}`, {
+  const response = await fetch(`/api/steps?workflow=${workflowId}&itemsPerPage=100`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

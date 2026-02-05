@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const data = await response.json();
-    const workflow = pick(data, ["id", "name"]);
+    const workflow = pick(data, ["id", "name", "description"]);
 
     return NextResponse.json(workflow);
   } catch (error) {
