@@ -2,10 +2,10 @@
 
 import { useCallback, useReducer } from "react";
 import { Hydra } from "../hydra";
-import { getSteps, patchStepPosition, postStep } from "./api";
+import { getSteps, patchStepsPosition, postStep } from "./api";
 import { StepContext } from "./context";
 import { StepReducer } from "./reducer";
-import { CreateStepPayload, Step, StepState } from "./types";
+import { CreateStepPayload, Step, StepState, UpdateStepsPositionPayload } from "./types";
 
 const initialState: StepState = {
   isLoading: false,
@@ -39,20 +39,16 @@ export function StepProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const updateStepPosition = useCallback(
-    async (stepId: string, position: number, workflowId: string) => {
-      try {
-        dispatch({ type: "SET_LOADING", payload: true });
-        await patchStepPosition(stepId, position);
-        await fetchSteps(workflowId);
-      } catch {
-        dispatch({ type: "SET_ERROR", payload: "Failed to update step position" });
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-      }
-    },
-    [fetchSteps]
-  );
+  const updateStepsPosition = useCallback(async (payload: UpdateStepsPositionPayload) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      patchStepsPosition(payload);
+    } catch {
+      dispatch({ type: "SET_ERROR", payload: "Failed to update step position" });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }, []);
 
   return (
     <StepContext.Provider
@@ -60,7 +56,7 @@ export function StepProvider({ children }: { children: React.ReactNode }) {
         ...state,
         fetchSteps,
         createStep,
-        updateStepPosition,
+        updateStepsPosition,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import { Hydra } from "@/lib/hydra";
-import { CreateStepPayload, Step } from "./types";
+import { CreateStepPayload, Step, UpdateStepsPositionPayload } from "./types";
 
 export const getSteps = async (workflowId: string): Promise<Hydra<Step>> => {
   const response = await fetch(`/api/steps?workflow=${workflowId}&itemsPerPage=100`, {
@@ -17,7 +17,6 @@ export const getSteps = async (workflowId: string): Promise<Hydra<Step>> => {
 };
 
 export const postStep = async (payload: CreateStepPayload): Promise<void> => {
-  console.log(payload);
   const response = await fetch("/api/steps", {
     method: "POST",
     headers: {
@@ -28,6 +27,20 @@ export const postStep = async (payload: CreateStepPayload): Promise<void> => {
 
   if (!response.ok) {
     throw new Error("Failed to create step");
+  }
+};
+
+export const patchStepsPosition = async (payload: UpdateStepsPositionPayload): Promise<void> => {
+  const response = await fetch(`/api/steps/position`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update steps position");
   }
 };
 
