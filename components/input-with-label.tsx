@@ -6,11 +6,13 @@ import { forwardRef } from "react";
 interface InputWithLabelProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  addon?: string;
+  type?: string;
   containerClassName?: string;
 }
 
 export const InputWithLabel = forwardRef<HTMLInputElement, InputWithLabelProps>(
-  ({ label, error, containerClassName, className, id, ...props }, ref) => {
+  ({ label, error, addon, type = "text", containerClassName, className, id, ...props }, ref) => {
     const inputId = id || `floating-input-${label.toLowerCase().replace(/\s+/g, "-")}`;
     const hasError = !!error;
 
@@ -27,6 +29,7 @@ export const InputWithLabel = forwardRef<HTMLInputElement, InputWithLabelProps>(
           {label}
         </Label>
         <Input
+          type={type}
           ref={ref}
           id={inputId}
           className={cn(
@@ -38,6 +41,11 @@ export const InputWithLabel = forwardRef<HTMLInputElement, InputWithLabelProps>(
           aria-describedby={hasError ? `${inputId}-error` : undefined}
           {...props}
         />
+        {addon && (
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-center pr-3 text-sm peer-disabled:opacity-50">
+            {addon}
+          </span>
+        )}
       </div>
     );
   }

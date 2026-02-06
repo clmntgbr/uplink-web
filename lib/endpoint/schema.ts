@@ -9,7 +9,7 @@ export const createEndpointSchema = z.object({
   path: z.string().min(1, "Path is required").startsWith("/", "Path must start with /"),
   method: z.enum(httpMethodsTuple),
   timeoutSeconds: z
-    .number("Timeout is required")
+    .number()
     .int("Timeout must be an integer")
     .min(1, "Timeout must be at least 1 second")
     .max(300, "Timeout must be at most 300 seconds"),

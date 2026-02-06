@@ -73,7 +73,14 @@ export function CreateEndpoint() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <InputWithLabel label="Method" disabled={isLoading} error={errors.method?.message} {...register("method")} />
-              <InputWithLabel label="Timeout" disabled={isLoading} error={errors.timeoutSeconds?.message} {...register("timeoutSeconds")} />
+              <InputWithLabel
+                label="Timeout"
+                disabled={isLoading}
+                error={errors.timeoutSeconds?.message}
+                addon="seconds"
+                type="number"
+                {...register("timeoutSeconds", { valueAsNumber: true })}
+              />
             </div>
           </form>
           <DrawerFooter>
