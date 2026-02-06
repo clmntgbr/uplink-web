@@ -6,11 +6,13 @@ import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerT
 import { Spinner } from "@/components/ui/spinner";
 import { useEndpoint } from "@/lib/endpoint/context";
 import { createEndpointSchema } from "@/lib/endpoint/schema";
+import { HttpMethods } from "@/lib/endpoint/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { SelectWithLabel } from "../select-with-label";
 
 export function CreateEndpoint() {
   const { createEndpoint } = useEndpoint();
@@ -72,7 +74,13 @@ export function CreateEndpoint() {
               <InputWithLabel label="Path" disabled={isLoading} error={errors.path?.message} {...register("path")} />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <InputWithLabel label="Method" disabled={isLoading} error={errors.method?.message} {...register("method")} />
+              <SelectWithLabel
+                label="Method"
+                disabled={isLoading}
+                error={errors.method?.message}
+                options={HttpMethods.map((method) => ({ label: method, value: method }))}
+                {...register("method")}
+              />
               <InputWithLabel
                 label="Timeout"
                 disabled={isLoading}

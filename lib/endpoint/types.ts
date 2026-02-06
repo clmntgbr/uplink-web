@@ -31,6 +31,8 @@ export interface EndpointState {
   error: string | null;
 }
 
+export const HttpMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+
 export type EndpointAction =
   | { type: "SET_ENDPOINTS"; payload: Hydra<Endpoint> }
   | { type: "SET_ERROR"; payload: string }

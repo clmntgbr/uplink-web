@@ -57,7 +57,7 @@ export function SelectWithLabel({
         <SelectTrigger
           id={id}
           className={cn(
-            "h-10 w-full bg-background focus:outline-none focus-visible:border-input focus-visible:ring-0 focus-visible:ring-offset-0",
+            "!h-10 w-full bg-background focus:outline-none focus-visible:border-input focus-visible:ring-0 focus-visible:ring-offset-0",
             hasError && "border-destructive ring-0",
             triggerClassName
           )}
