@@ -44,18 +44,9 @@ export function WorkflowProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const createWorkflow = useCallback(
-    async (payload: CreateWorkflowPayload): Promise<Workflow> => {
-      try {
-        dispatch({ type: "SET_LOADING", payload: true });
-        const workflow = await postWorkflow(payload);
-        fetchWorkflows();
-        return workflow;
-      } catch {
-        dispatch({ type: "SET_ERROR", payload: "Failed to create workflow" });
-        throw new Error("Failed to create workflow");
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-      }
+    async (payload: CreateWorkflowPayload) => {
+      await postWorkflow(payload);
+      await fetchWorkflows();
     },
     [fetchWorkflows]
   );

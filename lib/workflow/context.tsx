@@ -6,7 +6,7 @@ import { CreateWorkflowPayload, Workflow, WorkflowState } from "./types";
 export interface WorkflowContextType extends WorkflowState {
   fetchWorkflows: () => Promise<void>;
   fetchWorkflow: (id: string) => Promise<Workflow>;
-  createWorkflow: (payload: CreateWorkflowPayload) => Promise<Workflow>;
+  createWorkflow: (payload: CreateWorkflowPayload) => Promise<void>;
 }
 
 export const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);
