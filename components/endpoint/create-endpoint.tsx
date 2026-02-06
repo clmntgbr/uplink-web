@@ -51,18 +51,30 @@ export function CreateEndpoint() {
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
-        <Button>
+        <Button variant="outline">
           <Plus />
           <span>Create Endpoint</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-xl py-8">
-          <DrawerHeader>
-            <DrawerTitle className="scroll-m-20 text-balance text-center text-3xl font-extrabold tracking-tight">Create a new endpoint</DrawerTitle>
+        <div className="mx-auto w-full max-w-4xl py-8">
+          <DrawerHeader className="items-center">
+            <DrawerTitle className="scroll-m-20 text-balance text-center text-3xl font-extrabold tracking-tight max-w-xl">
+              Create a new endpoint and connect it to a workflow
+            </DrawerTitle>
           </DrawerHeader>
-          <form id="create-endpoint-form" className="p-4 pb-0">
-            <InputWithLabel label="Name" disabled={isLoading} error={errors.name?.message} {...register("name")} />
+          <form id="create-endpoint-form" className="p-4 pb-0 space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <InputWithLabel label="Name" disabled={isLoading} error={errors.name?.message} {...register("name")} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <InputWithLabel label="Base URI" disabled={isLoading} error={errors.baseUri?.message} {...register("baseUri")} />
+              <InputWithLabel label="Path" disabled={isLoading} error={errors.path?.message} {...register("path")} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <InputWithLabel label="Method" disabled={isLoading} error={errors.method?.message} {...register("method")} />
+              <InputWithLabel label="Timeout" disabled={isLoading} error={errors.timeoutSeconds?.message} {...register("timeoutSeconds")} />
+            </div>
           </form>
           <DrawerFooter>
             <div className="flex w-full items-center justify-end space-x-2">
