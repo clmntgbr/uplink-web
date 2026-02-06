@@ -13,7 +13,7 @@ export default function PrivateLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
       <UserProvider>
         <ProjectProvider>
           <EndpointProvider>
