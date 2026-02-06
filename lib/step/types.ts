@@ -2,6 +2,7 @@ import { Endpoint } from "@/lib/endpoint/types";
 
 export interface Step {
   id: string;
+  name: string;
   position: number;
   endpoint: Endpoint;
   body: Record<string, unknown>;

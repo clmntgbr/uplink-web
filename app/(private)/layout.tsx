@@ -13,14 +13,14 @@ export default function PrivateLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <UserProvider>
         <ProjectProvider>
           <EndpointProvider>
             <WorkflowProvider>
               <StepProvider>
                 <Header />
-                <div className="max-w-7xl mx-auto px-4">{children}</div>
+                <div className="mx-auto px-4">{children}</div>
                 <Toaster richColors expand={false} position="top-right" closeButton />
               </StepProvider>
             </WorkflowProvider>
