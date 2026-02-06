@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { createProjectSchema } from "@/lib/project/schema";
 import { useWorkflow } from "@/lib/workflow/context";
 import { createWorkflowSchema } from "@/lib/workflow/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,10 +10,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { InputWithLabel } from "../input-with-label";
 import { Spinner } from "../ui/spinner";
-import { Textarea } from "../ui/textarea";
 
 export function CreateWorkflow() {
   const { createWorkflow } = useWorkflow();
@@ -41,7 +38,7 @@ export function CreateWorkflow() {
     }
   };
 
-  const onSubmit = async (data: z.infer<typeof createProjectSchema>) => {
+  const onSubmit = async (data: z.infer<typeof createWorkflowSchema>) => {
     setIsLoading(true);
     try {
       await createWorkflow(data);
@@ -73,37 +70,10 @@ export function CreateWorkflow() {
           </DrawerHeader>
           <form id="create-workflow-form" className="p-4 pb-0 space-y-8">
             <div className="group relative w-full">
-              <Label
-                htmlFor="workflow-name"
-                className="bg-background absolute top-0 left-2 z-1 block -translate-y-1/2 px-1 text-xs aria-invalid:text-destructive"
-                aria-invalid={errors.name ? "true" : "false"}
-              >
-                Name
-              </Label>
-              <Input
-                disabled={isLoading}
-                id="workflow-name"
-                type="text"
-                className="bg-background h-10 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus:outline-none focus-visible:border-input aria-invalid:ring-0"
-                {...register("name")}
-                aria-invalid={errors.name ? "true" : "false"}
-              />
+              <InputWithLabel label="Name" disabled={isLoading} error={errors.name?.message} {...register("name")} />
             </div>
             <div className="group relative w-full">
-              <Label
-                htmlFor="workflow-description"
-                className="bg-background absolute top-0 left-2 z-1 block -translate-y-1/2 px-1 text-xs aria-invalid:text-destructive"
-                aria-invalid={errors.name ? "true" : "false"}
-              >
-                Description
-              </Label>
-              <Textarea
-                disabled={isLoading}
-                id="workflow-description"
-                className="bg-background h-24 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus:outline-none focus-visible:border-input aria-invalid:ring-0"
-                {...register("description")}
-                aria-invalid={errors.name ? "true" : "false"}
-              />
+              <InputWithLabel label="Description" disabled={isLoading} error={errors.description?.message} {...register("description")} />
             </div>
           </form>
           <DrawerFooter>
