@@ -1,4 +1,5 @@
 import { Hydra } from "@/lib/hydra";
+import { JsonObject } from "../json";
 
 export interface Endpoint {
   "@id": string;
@@ -8,9 +9,8 @@ export interface Endpoint {
   path: string;
   method: string;
   header: Record<string, string>;
-  body: Record<string, string>;
+  body: JsonObject;
   query: Record<string, string>;
-  response: Record<string, unknown>;
   timeoutSeconds: number;
 }
 
@@ -19,11 +19,10 @@ export interface CreateEndpointPayload {
   baseUri: string;
   path: string;
   method: string;
-  timeoutSeconds: number;
   header: Record<string, string>;
-  body: Record<string, unknown>;
-  response: Record<string, unknown>;
+  body: JsonObject;
   query: Record<string, string>;
+  timeoutSeconds: number;
 }
 
 export interface EndpointState {

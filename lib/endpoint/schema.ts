@@ -14,5 +14,6 @@ export const createEndpointSchema = z.object({
     .min(1, "Timeout must be at least 1 second")
     .max(300, "Timeout must be at most 300 seconds"),
   body: z.record(z.string(), z.unknown()).default({}),
-  response: z.record(z.string(), z.unknown()).default({}),
+  query: z.record(z.string(), z.unknown()).default({}),
+  header: z.record(z.string(), z.unknown()).default({}),
 });
