@@ -5,7 +5,10 @@ export const createEndpointSchema = z.object({
   name: z.string().min(1, "Name is required").max(50, "Name must be at most 50 characters"),
   baseUri: z.string().min(1, "Base URI is required").url("Must be a valid URL"),
   path: z.string().min(1, "Path is required").startsWith("/", "Path must start with /"),
-  method: z.enum(HttpMethods),
+  method: z
+    .string()
+    .min(1, "Method is required")
+    .refine((v) => (HttpMethods as readonly string[]).includes(v), "Invalid method"),
   timeoutSeconds: z
     .number()
     .int("Timeout must be an integer")

@@ -10,7 +10,7 @@ import { HttpMethods } from "@/lib/endpoint/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { SelectWithLabel } from "../select-with-label";
 
@@ -24,13 +24,14 @@ export function CreateEndpoint() {
     handleSubmit,
     reset,
     formState: { errors },
+    control,
   } = useForm<z.infer<typeof createEndpointSchema>>({
     resolver: zodResolver(createEndpointSchema),
     defaultValues: {
       name: "",
       baseUri: "",
       path: "",
-      method: "GET",
+      method: "",
       timeoutSeconds: 30,
       body: {},
       query: {},
@@ -74,12 +75,19 @@ export function CreateEndpoint() {
               <InputWithLabel label="Path" disabled={isLoading} error={errors.path?.message} {...register("path")} />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <SelectWithLabel
-                label="Method"
-                disabled={isLoading}
-                error={errors.method?.message}
-                options={HttpMethods.map((method) => ({ label: method, value: method }))}
-                {...register("method")}
+              <Controller
+                name="method"
+                control={control}
+                render={({ field }) => (
+                  <SelectWithLabel
+                    label="Method"
+                    disabled={isLoading}
+                    error={errors.method?.message}
+                    options={HttpMethods.map((method) => ({ label: method, value: method }))}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  />
+                )}
               />
               <InputWithLabel
                 label="Timeout"
