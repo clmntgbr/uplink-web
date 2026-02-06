@@ -42,7 +42,7 @@ export function StepProvider({ children }: { children: React.ReactNode }) {
   const updateStepsPosition = useCallback(async (payload: UpdateStepsPositionPayload) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
-      await patchStepsPosition(payload);
+      patchStepsPosition(payload);
     } catch {
       dispatch({ type: "SET_ERROR", payload: "Failed to update step position" });
     } finally {
