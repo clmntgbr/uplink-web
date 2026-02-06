@@ -31,15 +31,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
 
   const createProject = useCallback(
     async (payload: CreateProjectPayload) => {
-      try {
-        dispatch({ type: "SET_LOADING", payload: true });
-        await postProject(payload);
-        await fetchProjects();
-      } catch {
-        dispatch({ type: "SET_ERROR", payload: "Failed to create project" });
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-      }
+      await postProject(payload);
+      await fetchProjects();
     },
     [fetchProjects]
   );

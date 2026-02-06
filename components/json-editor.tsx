@@ -4,12 +4,10 @@ import { useCallback } from "react";
 interface JsonEditorProps {
   value: Record<string, string>;
   onChange: (value: string) => void;
-  height?: string;
   readOnly?: boolean;
-  placeholder?: string;
 }
 
-export function JsonEditor({ value, onChange, height = "200px", readOnly = false }: JsonEditorProps) {
+export function JsonEditor({ value, onChange, readOnly = false }: JsonEditorProps) {
   const jsonValue = JSON.stringify(value, null, 2);
 
   const handleChange = useCallback(
@@ -22,7 +20,7 @@ export function JsonEditor({ value, onChange, height = "200px", readOnly = false
   return (
     <div className="rounded-lg overflow-hidden border border-border/50 bg-[#1e1e1e]">
       <Editor
-        height={height}
+        height="200px"
         language="json"
         value={jsonValue}
         onChange={handleChange}
