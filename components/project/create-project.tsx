@@ -55,7 +55,7 @@ export function CreateProject() {
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <Plus />
           <span>Create Project</span>
         </Button>
