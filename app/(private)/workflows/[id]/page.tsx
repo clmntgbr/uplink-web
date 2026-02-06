@@ -20,7 +20,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
-  const { fetchSteps } = useStep();
+  const { fetchSteps, updateStepsPosition } = useStep();
   const { fetchWorkflow } = useWorkflow();
   const [steps, setSteps] = useState<Hydra<Step>>(initHydra<Step>());
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
@@ -51,19 +51,30 @@ export default function Page() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = steps.member.findIndex((item) => item.id === active.id);
-      const newIndex = steps.member.findIndex((item) => item.id === over.id);
+    if (!over || active.id === over.id) return;
 
-      const newItems = steps.member.splice(newIndex, 0, steps.member.splice(oldIndex, 1)[0]);
+    const oldIndex = steps.member.findIndex((item) => item.id === active.id);
+    const newIndex = steps.member.findIndex((item) => item.id === over.id);
 
-      setSteps((prev) => ({
-        ...prev,
-        member: newItems,
-      }));
+    if (oldIndex === -1 || newIndex === -1) return;
 
-      toast.success("Step order updated");
-    }
+    const newMember = [...steps.member];
+    const [removed] = newMember.splice(oldIndex, 1);
+    newMember.splice(newIndex, 0, removed);
+
+    const reordered = newMember.map((step, index) => ({ ...step, position: index + 1 }));
+
+    updateStepsPosition({
+      workflow: workflow!.id,
+      steps: reordered.map((s) => ({ id: s.id, position: s.position })),
+    });
+
+    setSteps((prev) => ({
+      ...prev,
+      member: reordered,
+    }));
+
+    toast.success("Step order updated");
   };
 
   useEffect(() => {

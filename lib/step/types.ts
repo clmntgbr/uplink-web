@@ -20,6 +20,11 @@ export interface CreateStepPayload {
   response: Record<string, unknown>;
 }
 
+export interface UpdateStepsPositionPayload {
+  workflow: string;
+  steps: { id: string; position: number }[];
+}
+
 export interface StepState {
   isLoading: boolean;
   error: string | null;
