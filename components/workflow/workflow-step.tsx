@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Endpoint } from "@/lib/endpoint/types";
+import { getMethodColor } from "@/lib/method-color";
 import { Step } from "@/lib/step/types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -25,17 +26,6 @@ export function StepCard({ step, endpoint, onUpdate, onDelete }: StepCardProps) 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
-
-  const getMethodColor = (method: string) => {
-    const colors: Record<string, string> = {
-      GET: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-      POST: "bg-green-500/10 text-green-500 border-green-500/20",
-      PUT: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-      DELETE: "bg-red-500/10 text-red-500 border-red-500/20",
-      PATCH: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-    };
-    return colors[method] || "bg-gray-500/10 text-gray-500";
   };
 
   return (
@@ -86,13 +76,12 @@ export function StepCard({ step, endpoint, onUpdate, onDelete }: StepCardProps) 
           {/* Expanded Content */}
           <CollapsibleContent>
             <CardContent className="pt-0 space-y-4 border-t">
-              {/* Variables */}
               <div className="space-y-2 pt-4">
                 <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-info" />
-                  Variables
+                  Body
                 </label>
-                <JsonEditor value={step.variables} onChange={(value) => onUpdate({ variables: JSON.parse(value) })} />
+                <JsonEditor value={step.body as Record<string, string>} onChange={(value) => onUpdate({ body: JSON.parse(value) })} />
               </div>
 
               <div className="space-y-2">
@@ -104,15 +93,6 @@ export function StepCard({ step, endpoint, onUpdate, onDelete }: StepCardProps) 
                   value={step.response as Record<string, string>}
                   onChange={(jsonString) => onUpdate({ response: JSON.parse(jsonString) })}
                 />
-              </div>
-
-              {/* Asserts */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-warning" />
-                  Assertions
-                </label>
-                <JsonEditor value={step.asserts} onChange={(value) => onUpdate({ asserts: JSON.parse(value) })} />
               </div>
             </CardContent>
           </CollapsibleContent>

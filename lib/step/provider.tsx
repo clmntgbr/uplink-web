@@ -28,32 +28,31 @@ export function StepProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const createStep = useCallback(
-    async (payload: CreateStepPayload, workflowId: string) => {
+  const createStep = useCallback(async (payload: CreateStepPayload) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      await postStep(payload);
+    } catch {
+      dispatch({ type: "SET_ERROR", payload: "Failed to create step" });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }, []);
+
+  const updateStepPosition = useCallback(
+    async (stepId: string, position: number, workflowId: string) => {
       try {
         dispatch({ type: "SET_LOADING", payload: true });
-        await postStep(payload);
+        await patchStepPosition(stepId, position);
         await fetchSteps(workflowId);
       } catch {
-        dispatch({ type: "SET_ERROR", payload: "Failed to create step" });
+        dispatch({ type: "SET_ERROR", payload: "Failed to update step position" });
       } finally {
         dispatch({ type: "SET_LOADING", payload: false });
       }
     },
     [fetchSteps]
   );
-
-  const updateStepPosition = useCallback(async (stepId: string, position: number, workflowId: string) => {
-    try {
-      dispatch({ type: "SET_LOADING", payload: true });
-      await patchStepPosition(stepId, position);
-      await fetchSteps(workflowId);
-    } catch {
-      dispatch({ type: "SET_ERROR", payload: "Failed to update step position" });
-    } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
-    }
-  }, []);
 
   return (
     <StepContext.Provider

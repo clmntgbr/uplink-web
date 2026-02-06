@@ -46,11 +46,15 @@ export async function POST(request: NextRequest) {
     const headers = createAuthHeaders(auth.token);
     headers["Content-Type"] = "application/ld+json";
 
+    console.log(payload);
+
     const response = await fetch(`${BACKEND_API_URL}/steps`, {
       method: "POST",
       headers,
       body: JSON.stringify(payload),
     });
+
+    console.log(response);
 
     if (!response.ok) {
       return NextResponse.json({ success: false }, { status: response.status });

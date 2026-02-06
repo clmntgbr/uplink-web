@@ -4,13 +4,20 @@ export interface Step {
   id: string;
   position: number;
   endpoint: Endpoint;
-  variables: Record<string, string>;
-  asserts: Record<string, string>;
+  body: Record<string, unknown>;
+  query: Record<string, unknown>;
+  header: Record<string, unknown>;
   response: Record<string, unknown>;
 }
 
 export interface CreateStepPayload {
-  position: number;
+  name: string;
+  endpoint: string;
+  workflow: string;
+  body: Record<string, unknown>;
+  query: Record<string, unknown>;
+  header: Record<string, unknown>;
+  response: Record<string, unknown>;
 }
 
 export interface StepState {

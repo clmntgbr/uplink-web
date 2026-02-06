@@ -1,8 +1,8 @@
 "use client";
 
 import { CreateEndpoint } from "@/components/endpoint/create-endpoint";
+import { CreateStep } from "@/components/step/create-step";
 import { EmptySteps } from "@/components/step/empty-steps";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,6 @@ import { useWorkflow } from "@/lib/workflow/context";
 import { Workflow } from "@/lib/workflow/types";
 import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -80,6 +79,12 @@ export default function Page() {
   if (!workflow) {
     return <div>Loading...</div>;
   }
+
+  const handleCreateStepSuccess = () => {
+    fetchSteps(params.id as string).then((steps) => {
+      setSteps(steps);
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -152,10 +157,7 @@ export default function Page() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3"></div>
               <div className="flex items-center gap-3">
-                <Button size="sm">
-                  <Plus className="size-4" />
-                  Create step
-                </Button>
+                <CreateStep workflow={workflow} onSuccess={handleCreateStepSuccess} />
                 <CreateEndpoint />
               </div>
             </div>

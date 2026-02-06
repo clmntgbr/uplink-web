@@ -17,6 +17,7 @@ export const getSteps = async (workflowId: string): Promise<Hydra<Step>> => {
 };
 
 export const postStep = async (payload: CreateStepPayload): Promise<void> => {
+  console.log(payload);
   const response = await fetch("/api/steps", {
     method: "POST",
     headers: {

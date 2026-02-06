@@ -1,6 +1,7 @@
 import { Hydra } from "@/lib/hydra";
 
 export interface Endpoint {
+  "@id": string;
   id: string;
   name: string;
   baseUri: string;
@@ -8,7 +9,8 @@ export interface Endpoint {
   method: string;
   header: Record<string, string>;
   body: Record<string, string>;
-  isActive: boolean;
+  query: Record<string, string>;
+  response: Record<string, unknown>;
   timeoutSeconds: number;
 }
 
